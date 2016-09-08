@@ -1436,6 +1436,13 @@ declare namespace dojo {
      *
      */
     interface NodeList_traverse { (): void }
+
+	interface signalRemove {
+		remove(): void
+	}
+
+	type genericFunction = (...args: any[]) => any;
+
     /**
      * Permalink: http://dojotoolkit.org/api/1.9/dojo/on.html
      *
@@ -1469,109 +1476,21 @@ declare namespace dojo {
      * @param listener This is the function that should be called when the event fires.
      * @param dontFix
      */
-    interface on { (target: HTMLElement, type: String, listener: Function, dontFix: any): void }
-    /**
-     * Permalink: http://dojotoolkit.org/api/1.9/dojo/on.html
-     *
-     * A function that provides core event listening functionality. With this function
-     * you can provide a target, event type, and listener to be notified of
-     * future matching events that are fired.
-     * To listen for "click" events on a button node, we can do:
-     *
-     * define(["dojo/on"], function(listen){
-     *     on(button, "click", clickHandler);
-     *     ...
-     * Evented JavaScript objects can also have their own events.
-     *
-     * var obj = new Evented;
-     * on(obj, "foo", fooHandler);
-     * And then we could publish a "foo" event:
-     *
-     * on.emit(obj, "foo", {key: "value"});
-     * We can use extension events as well. For example, you could listen for a tap gesture:
-     *
-     * define(["dojo/on", "dojo/gesture/tap", function(listen, tap){
-     *     on(button, tap, tapHandler);
-     *     ...
-     * which would trigger fooHandler. Note that for a simple object this is equivalent to calling:
-     *
-     * obj.onfoo({key:"value"});
-     * If you use on.emit on a DOM node, it will use native event dispatching when possible.
-     *
-     * @param target This is the target object or DOM element that to receive events from
-     * @param type This is the name of the event to listen for or an extension event type.
-     * @param listener This is the function that should be called when the event fires.
-     * @param dontFix
-     */
-    interface on { (target: Object, type: String, listener: Function, dontFix: any): void }
-    /**
-     * Permalink: http://dojotoolkit.org/api/1.9/dojo/on.html
-     *
-     * A function that provides core event listening functionality. With this function
-     * you can provide a target, event type, and listener to be notified of
-     * future matching events that are fired.
-     * To listen for "click" events on a button node, we can do:
-     *
-     * define(["dojo/on"], function(listen){
-     *     on(button, "click", clickHandler);
-     *     ...
-     * Evented JavaScript objects can also have their own events.
-     *
-     * var obj = new Evented;
-     * on(obj, "foo", fooHandler);
-     * And then we could publish a "foo" event:
-     *
-     * on.emit(obj, "foo", {key: "value"});
-     * We can use extension events as well. For example, you could listen for a tap gesture:
-     *
-     * define(["dojo/on", "dojo/gesture/tap", function(listen, tap){
-     *     on(button, tap, tapHandler);
-     *     ...
-     * which would trigger fooHandler. Note that for a simple object this is equivalent to calling:
-     *
-     * obj.onfoo({key:"value"});
-     * If you use on.emit on a DOM node, it will use native event dispatching when possible.
-     *
-     * @param target This is the target object or DOM element that to receive events from
-     * @param type This is the name of the event to listen for or an extension event type.
-     * @param listener This is the function that should be called when the event fires.
-     * @param dontFix
-     */
-    interface on { (target: HTMLElement, type: Function, listener: Function, dontFix: any): void }
-    /**
-     * Permalink: http://dojotoolkit.org/api/1.9/dojo/on.html
-     *
-     * A function that provides core event listening functionality. With this function
-     * you can provide a target, event type, and listener to be notified of
-     * future matching events that are fired.
-     * To listen for "click" events on a button node, we can do:
-     *
-     * define(["dojo/on"], function(listen){
-     *     on(button, "click", clickHandler);
-     *     ...
-     * Evented JavaScript objects can also have their own events.
-     *
-     * var obj = new Evented;
-     * on(obj, "foo", fooHandler);
-     * And then we could publish a "foo" event:
-     *
-     * on.emit(obj, "foo", {key: "value"});
-     * We can use extension events as well. For example, you could listen for a tap gesture:
-     *
-     * define(["dojo/on", "dojo/gesture/tap", function(listen, tap){
-     *     on(button, tap, tapHandler);
-     *     ...
-     * which would trigger fooHandler. Note that for a simple object this is equivalent to calling:
-     *
-     * obj.onfoo({key:"value"});
-     * If you use on.emit on a DOM node, it will use native event dispatching when possible.
-     *
-     * @param target This is the target object or DOM element that to receive events from
-     * @param type This is the name of the event to listen for or an extension event type.
-     * @param listener This is the function that should be called when the event fires.
-     * @param dontFix
-     */
-    interface on { (target: Object, type: String, listener: Function, dontFix?: any): { remove: { (): void } } }
+
+	type onTargetParameter = HTMLElement | Object;
+	type onTypeParameter = string | genericFunction;
+	type onListenerParameter = genericFunction;
+
+	type matchesTarget = {matches: genericFunction} | dojo.query;
+
+    interface on {
+		(
+			target: onTargetParameter,
+			type: onTypeParameter,
+			listener: onListenerParameter,
+			dontFix?: boolean
+		): signalRemove
+	}
     interface on {
         /**
          *
@@ -1579,7 +1498,11 @@ declare namespace dojo {
          * @param type
          * @param event
          */
-        emit(target: any, type: any, event: any): any;
+        emit(
+			target: onTargetParameter,
+			type: onTypeParameter,
+			event: { bubbles?: boolean, cancelable?: boolean }
+		): boolean;
         /**
          * This function acts the same as on(), but will only call the listener once. The
          * listener will be called for the first
@@ -1590,7 +1513,7 @@ declare namespace dojo {
          * @param listener
          * @param dontFix
          */
-        once(target: any, type: any, listener: any, dontFix?: any): any;
+        once(target: onTargetParameter, type: onTypeParameter, listener: onListenerParameter, dontFix?: boolean): signalRemove;
         /**
          *
          * @param target
@@ -1600,7 +1523,14 @@ declare namespace dojo {
          * @param dontFix
          * @param matchesTarget
          */
-        parse(target: any, type: any, listener: any, addListener: any, dontFix: any, matchesTarget: any): any;
+        parse(
+			target: onTargetParameter,
+			type: onTypeParameter,
+			listener: onListenerParameter,
+			addListener: genericFunction,
+			dontFix: boolean,
+			matchesTarget: any
+		): any;
         /**
          * This function acts the same as on(), but with pausable functionality. The
          * returned signal object has pause() and resume() functions. Calling the
