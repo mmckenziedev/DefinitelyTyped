@@ -1286,46 +1286,31 @@ declare namespace dojo {
      *
      * @param name The name (if a string) or identifier (if an integer) of the feature to test.
      */
-    interface has { (name: String): void }
-    /**
-     * Permalink: http://dojotoolkit.org/api/1.9/dojo/has.html
-     *
-     * Return the current value of the named feature.
-     * Returns the value of the feature named by name. The feature must have been
-     * previously added to the cache by has.add.
-     *
-     * @param name The name (if a string) or identifier (if an integer) of the feature to test.
-     */
-    interface has { (name: number): void }
+    interface has { (name: string | number): any }
     interface has {
-        /**
-         *
-         */
-        cache: string;
+        cache: Object;
         /**
          * Register a new feature test for some named feature.
          *
          * @param name The name (if a string) or identifier (if an integer) of the feature to test.
-         * @param test A test function to register. If a function, queued for testing until actuallyneeded. The test function should return a boolean indicatingthe presence of a feature or bug.
-         * @param now               OptionalOptional. Omit if test is not a function. Provides a way to immediatelyrun the test and cache the result.
-         * @param force               OptionalOptional. If the test already exists and force is truthy, then the existingtest will be replaced; otherwise, add does not replace an existing test (thatis, by default, the first test advice wins).
+         * @param test A test function to register. If a function, queued for testing until actually needed. The test function should return a boolean indicating the presence of a feature or bug.
+         * @param now  Optional. Omit if test is not a function. Provides a way to immediately run the test and cache the result.
+         * @param force Optional. If the test already exists and force is truthy, then the existing test will be replaced; otherwise, add does not replace an existing test (that is, by default, the first test advice wins).
          */
-        add(name: String, test: Function, now?: boolean, force?: boolean): any;
+        add<T>(name: string | number, test: (...args: any[]) => T, now?: boolean, force?: boolean): void | boolean | T;
         /**
          * Register a new feature test for some named feature.
          *
          * @param name The name (if a string) or identifier (if an integer) of the feature to test.
-         * @param test A test function to register. If a function, queued for testing until actuallyneeded. The test function should return a boolean indicatingthe presence of a feature or bug.
-         * @param now               OptionalOptional. Omit if test is not a function. Provides a way to immediatelyrun the test and cache the result.
-         * @param force               OptionalOptional. If the test already exists and force is truthy, then the existingtest will be replaced; otherwise, add does not replace an existing test (thatis, by default, the first test advice wins).
+         * @param test A test function to register. If a function, queued for testing until actually needed. The test function should return a boolean indicating the presence of a feature or bug.
+         * @param now  Optional. Omit if test is not a function. Provides a way to immediately run the test and cache the result.
+         * @param force Optional. If the test already exists and force is truthy, then the existing test will be replaced; otherwise, add does not replace an existing test (that is, by default, the first test advice wins).
          */
-        add(name: number, test: Function, now?: boolean, force?: boolean): any;
+        add<T>(name: string | number, test: T, now?: boolean, force?: boolean): void | boolean | T;
         /**
          * Deletes the contents of the element passed to test functions.
-         *
-         * @param element
          */
-        clearElement(element: any): void;
+        clearElement(element: HTMLElement): void;
         /**
          * Conditional loading of AMD modules based on a has feature test value.
          *
@@ -1333,14 +1318,14 @@ declare namespace dojo {
          * @param parentRequire The loader require function with respect to the module that contained the plugin resource in it'sdependency list.
          * @param loaded Callback to loader that consumes result of plugin demand.
          */
-        load(id: String, parentRequire: Function, loaded: Function): void;
+        load(id: string, parentRequire: (ids: string[], Function) => any, loaded: Function): void;
         /**
          * Resolves id into a module id based on possibly-nested tenary expression that branches on has feature test value(s).
          *
          * @param id
          * @param toAbsMid Resolves a relative module id into an absolute module id
          */
-        normalize(id: any, toAbsMid: Function): void;
+        normalize<T>(id: string, toAbsMid: (id?: string) => T): number | T;
     }
 
     namespace has {
@@ -1764,7 +1749,29 @@ declare namespace dojo {
      * It returns the has() function.
      *
      */
-    interface sniff{(): void}
+    interface sniff {
+        (name: "air"): boolean
+        (name: "wp"): number | void
+        (name: "msapp"): number | void
+        (name: "khtml"): number | void
+        (name: "edge"): number | void
+        (name: "opr"): number | void
+        (name: "webkit"): boolean | number | void
+        (name: "chrome"): boolean | number | void
+        (name: "android"): boolean | number | void
+        (name: "safari"): boolean | number | void
+        (name: "mac"): boolean
+        (name: "quirks"): boolean
+        (name: "bb"): boolean | number | void
+        (name: "trident"): number | void
+        (name: "svg"): boolean
+        (name: "opera"): number
+        (name: "Gecko"): number
+        (name: "ff"): number | void
+        (name: "ie"): boolean | void
+        (name: "wii"): boolean | number
+        (name: string): any
+	}
     /**
      * Permalink: http://dojotoolkit.org/api/1.9/dojo/when.html
      *
